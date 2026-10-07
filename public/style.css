@@ -101,3 +101,45 @@ circle.cursor-pointer:active {
   cursor: grabbing;
 }
 
+/* =====================================================================
+   TỐI ƯU HÓA RESPONSIVE RIÊNG CHO ĐIỆN THOẠI & TABLET (< 768px)
+   ===================================================================== */
+@media (max-width: 768px) {
+  /* Khung chứa header tự co nhỏ padding */
+  header {
+    height: auto !important;
+    padding: 0.5rem 0.25rem !important;
+  }
+  
+  header > div {
+    height: auto !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  /* SVG bảng vẽ tự điều chỉnh chiều cao trên màn hình dọc */
+  #geometrySvg {
+    height: 300px !important;
+    touch-action: none;
+  }
+
+  /* Canvas mini trên điện thoại */
+  #miniGraphInteractiveCanvas {
+    touch-action: none;
+    max-width: 100% !important;
+  }
+
+  /* Khung Vis.js trên điện thoại gọn gàng */
+  #graphCanvas {
+    min-height: 380px !important;
+  }
+
+  /* Các nút mẫu hình nhanh trên điện thoại hiển thị dạng thanh cuộn ngang mượt */
+  .quick-shapes-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+}
+
