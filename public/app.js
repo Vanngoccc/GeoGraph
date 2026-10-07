@@ -1265,6 +1265,25 @@ function drawMiniCanvas() {
   }
 
   // Đồng bộ tác động trực tiếp sang Quả cầu Node tương ứng trên Sơ đồ Neo4j
+    // Nút thông minh linh hoạt trên thanh tiêu đề Sơ đồ Đồ thị
+  const btnGraphUntangle = document.getElementById('btnGraphUntangle');
+  const txtGraphUntangle = document.getElementById('txtGraphUntangle');
+  if (btnGraphUntangle) {
+    if (isMiniSelfIntersecting) {
+      btnGraphUntangle.classList.remove('hidden');
+      btnGraphUntangle.className = 'px-3 py-1.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer animate-pulse';
+      btnGraphUntangle.title = 'Tự động sắp xếp lại các đỉnh để gỡ chéo cạnh bị cắt';
+      if (txtGraphUntangle) txtGraphUntangle.textContent = 'Gỡ rối hình';
+    } else if (!isMiniConvex) {
+      btnGraphUntangle.classList.remove('hidden');
+      btnGraphUntangle.className = 'px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl text-xs shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer animate-pulse';
+      btnGraphUntangle.title = 'Tự động đẩy đỉnh lõm ra ngoài để tạo tứ giác lồi';
+      if (txtGraphUntangle) txtGraphUntangle.textContent = 'Nắn lồi hình';
+    } else {
+      btnGraphUntangle.classList.add('hidden');
+    }
+  }
+
   highlightNeo4jNode(matchedId);
 }
 
