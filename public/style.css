@@ -1,9 +1,11 @@
 /* GeoGraph Custom Stylesheet */
 
-/* ===== GLOBAL ZOOM — khớp giao diện local 80% browser zoom ===== */
-html {
-  zoom: 85%;
+/* ===== FIX: Chặn vuốt ngang / scroll ngang không mong muốn ===== */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
 }
+
 
 @keyframes scaleUp {
   from {
