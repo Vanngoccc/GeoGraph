@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoGraph - Vườn tri thức hình học phẳng</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Vis.js Network CDN -->
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <!-- Google Fonts: Inter & Quicksand -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-['Inter',sans-serif] min-h-screen flex flex-col">
+
+  <!-- 1. THANH HEADER ĐIỀU HƯỚNG CHÍNH CHUẨN ĐẸP KHÔNG LỖI -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+      
+      <!-- Logo thương hiệu bên trái -->
+      <div class="flex items-center space-x-2.5 cursor-pointer flex-shrink-0" onclick="switchView('sandbox')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+          <i class="fa-solid fa-shapes text-base"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-bold font-['Quicksand'] bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent leading-none">GeoGraph</span>
+          <span class="text-[10px] text-slate-400 font-medium">Hình học phẳng</span>
+        </div>
+      </div>
+
+      <!-- 3 CHẾ ĐỘ XEM TRUNG TÂM -->
+      <div class="bg-slate-100 p-1 rounded-2xl flex items-center border border-slate-200 shadow-inner flex-shrink-0">
+        <!-- Chế độ 1: VẼ & TƯƠNG TÁC -->
+        <button id="btnViewSandbox" onclick="switchView('sandbox')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all bg-white text-sky-600 shadow-sm">
+          <i class="fa-solid fa-draw-polygon"></i>
+          <span>Vẽ &amp; Tương tác</span>
+        </button>
+
+        <!-- Chế độ 2: SƠ ĐỒ ĐỒ THỊ -->
+        <button id="btnViewGraph" onclick="switchView('graph')" class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-diagram-project"></i>
+          <span>Sơ đồ đồ thị</span>
+        </button>
+
+        <!-- Chế độ 3: THƯ VIỆN HÌNH HỌC -->
+        <button id="btnViewCards" onclick="switchView('cards')" class="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-table-cells-large"></i>
+          <span>Thư viện hình học</span>
+        </button>
+      </div>
+
+      <!-- CÁC CÔNG CỤ BỔ TRỢ & BỘ CHỌN VAI TRÒ -->
+      <div class="flex items-center space-x-1.5 flex-shrink-0">
+        
+        <!-- Nút Lộ trình chứng minh -->
+        <button onclick="openProofModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-all flex items-center space-x-1" title="Lộ trình chứng minh">
+          <i class="fa-solid fa-route text-emerald-600"></i>
+          <span class="hidden md:inline">Lộ trình chứng minh</span>
+        </button>
+
+        <!-- Nút So sánh hai hình -->
+        <button onclick="openCompareModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-all flex items-center space-x-1" title="So sánh hai hình">
+          <i class="fa-solid fa-code-compare text-amber-600"></i>
+          <span class="hidden md:inline">So sánh 2 hình</span>
+        </button>
+
+        <!-- Nút Luyện tập trắc nghiệm -->
+        <button onclick="openQuizModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition-all flex items-center space-x-1" title="Luyện tập trắc nghiệm">
+          <i class="fa-solid fa-graduation-cap text-purple-600"></i>
+          <span class="hidden md:inline">Luyện tập</span>
+        </button>
+
+        <!-- Nút Thêm hình mới -->
+        <button id="btnTeacherDraft" onclick="openDraftModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 transition-all flex items-center space-x-1" title="Thêm hình mới">
+          <i class="fa-solid fa-file-circle-plus text-teal-600"></i>
+          <span class="hidden lg:inline">➕ Thêm hình mới</span>
+        </button>
+
+        <!-- Nút Duyệt đóng góp -->
+        <button id="btnAdminReview" onclick="openReviewModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition-all flex items-center space-x-1" title="Duyệt đóng góp">
+          <i class="fa-solid fa-stamp text-rose-600"></i>
+          <span class="hidden lg:inline">Duyệt đóng góp</span>
+          <span id="pendingCountBadge" class="w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+        </button>
+
+        <!-- Bộ chọn vai trò người dùng -->
+        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <i class="fa-solid fa-user text-slate-500 text-xs pl-1 hidden xl:inline"></i>
+          <select id="userRoleSelect" onchange="changeUserRole(this.value)" class="text-xs font-semibold bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-700 outline-none cursor-pointer hover:border-indigo-400 transition-all max-w-[150px] sm:max-w-[200px] truncate">
+            <option value="ALL">Chế độ người dùng</option>
+            <option value="STUDENT">Học sinh</option>
+            <option value="TEACHER">Giáo viên</option>
+            <option value="ADMIN">Quản trị viên</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 2. KHÔNG GIAN NỘI DUNG CHÍNH -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col relative space-y-4">
+
+    <!-- ============================================================= -->
+    <!-- KHUNG CHÍNH 1: XƯỞNG HÌNH HỌC TƯƠNG TÁC ĐỘNG (MẶC ĐỊNH)        -->
+    <!-- ============================================================= -->
+    <div id="sandboxContainerWrapper" class="flex-1 bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col space-y-4">
+      
+      <!-- Thanh công cụ mẫu nắn hình nhanh -->
+      <div class="p-3 bg-slate-100/80 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center space-x-1.5 flex-wrap">
+          <span class="text-slate-600 font-bold mr-1"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1"></i>Mẫu hình nhanh:</span>
+          <button onclick="snapToPreset('SQUARE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình vuông</button>
+          <button onclick="snapToPreset('RECTANGLE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình chữ nhật</button>
+          <button onclick="snapToPreset('RHOMBUS')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thoi</button>
+          <button onclick="snapToPreset('PARALLELOGRAM')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình bình hành</button>
+          <button onclick="snapToPreset('ISOSCELES_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thang cân</button>
+          <button onclick="snapToPreset('RIGHT_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thang vuông</button>
+          <button onclick="snapToPreset('FREE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Tứ giác tự do</button>
+        </div>
+        <div class="flex items-center space-x-4">
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium" title="Tự động dính đỉnh vào ô lưới 1cm (20px) khi kéo">
+            <input type="checkbox" id="chkGridSnap" checked onchange="toggleGridSnap(this.checked)" class="rounded text-indigo-600">
+            <span>Hút điểm lưới (1cm)</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium">
+            <input type="checkbox" id="chkShowDiagonals" checked onchange="drawGeometrySandbox()" class="rounded text-indigo-600">
+            <span>Đường chéo AC, BD</span>
+          </label>
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium">
+            <input type="checkbox" id="chkShowAngles" checked onchange="drawGeometrySandbox()" class="rounded text-indigo-600">
+            <span>Góc và ký hiệu 90°</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Không gian vẽ tương tác và bảng nhận diện tức thời -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Khung vẽ tương tác SVG (8 cột) -->
+        <div class="lg:col-span-8 bg-slate-900 rounded-3xl p-3 relative shadow-inner overflow-hidden flex flex-col justify-between">
+          <div class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-slate-400 border-b border-slate-800">
+            <span class="flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="text-sky-300 font-semibold">Kéo các đỉnh A, B, C, D để đổi hình</span>
+            </span>
+            <span id="canvasCoordsText" class="font-mono text-slate-400 text-[11px]">Tọa độ: (x, y)</span>
+          </div>
+
+          <!-- Bảng vẽ SVG hình học động -->
+          <svg id="geometrySvg" class="w-full h-[400px] sm:h-[430px] cursor-crosshair select-none" viewBox="0 0 640 400"></svg>
+
+          <div class="w-full px-3 py-1.5 text-[11px] text-slate-500 border-t border-slate-800 flex justify-between">
+            <span>Ký hiệu góc vuông tự động hiện khi đạt 90°</span>
+            <span>Tỷ lệ: 20px = 1 cm</span>
+          </div>
+        </div>
+
+        <!-- Bảng nhận diện định lý và TỰ DO CHỈNH SỬA THÔNG SỐ (4 cột) -->
+        <div class="lg:col-span-4 flex flex-col space-y-4">
+          
+          <!-- Hộp nhận diện định lý hình học -->
+          <div id="sandboxDetectionBox" class="p-5 rounded-3xl bg-gradient-to-br from-indigo-50 via-sky-50 to-white border-2 border-indigo-200 shadow-md">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider flex items-center space-x-1">
+                <i class="fa-solid fa-brain text-indigo-500"></i>
+                <span>Hình nhận diện:</span>
+              </span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+
+            <h4 id="detectedShapeName" class="text-2xl font-bold text-indigo-900 font-['Quicksand']">Hình vuông</h4>
+            <p id="detectedShapeReason" class="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
+              Bốn cạnh bằng nhau và bốn góc bằng 90 độ (hai đường chéo bằng nhau và vuông góc).
+            </p>
+
+            <div class="mt-4 pt-3 border-t border-indigo-100 flex items-center justify-between">
+              <span id="shapeAccuracyBadge" class="text-xs text-emerald-700 font-bold flex items-center"><i class="fa-solid fa-circle-check mr-1"></i>Đã khớp tính chất</span>
+              <button id="btnOpenDetectedDetails" onclick="" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center space-x-1">
+                <span>Tính chất &amp; công thức</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bảng độ dài 4 cạnh CÓ THỂ GÕ NHẬP / CHỈNH SỐ ĐO TRỰC TIẾP -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h5 class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                <i class="fa-solid fa-pen-to-square text-sky-600"></i>
+                <span>Chỉnh độ dài các cạnh (cm)</span>
+              </h5>
+              <span class="text-[10px] text-sky-600 font-semibold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">Gõ số đo tùy ý</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-2xs">
+                <span class="text-slate-600 font-semibold">AB:</span>
+                <div class="flex items-center space-x-1">
+                  <input type="number" id="input_side_ab" min="2" max="25" step="0.5" value="10.0" 
+                         oninput="handleSideInputChange('AB', this.value)"
+                         class="w-16 px-1 py-0.5 text-right font-mono font-bold bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-sky-500 outline-none text-slate-800">
+                  <span class="text-[10px] text-slate-400">cm</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-2xs">
+                <span class="text-slate-600 font-semibold">BC:</span>
+                <div class="flex items-center space-x-1">
+                  <input type="number" id="input_side_bc" min="2" max="25" step="0.5" value="10.0" 
+                         oninput="handleSideInputChange('BC', this.value)"
+                         class="w-16 px-1 py-0.5 text-right font-mono font-bold bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-sky-500 outline-none text-slate-800">
+                  <span class="text-[10px] text-slate-400">cm</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-2xs">
+                <span class="text-slate-600 font-semibold">CD:</span>
+                <div class="flex items-center space-x-1">
+                  <input type="number" id="input_side_cd" min="2" max="25" step="0.5" value="10.0" 
+                         oninput="handleSideInputChange('CD', this.value)"
+                         class="w-16 px-1 py-0.5 text-right font-mono font-bold bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-sky-500 outline-none text-slate-800">
+                  <span class="text-[10px] text-slate-400">cm</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-2xs">
+                <span class="text-slate-600 font-semibold">DA:</span>
+                <div class="flex items-center space-x-1">
+                  <input type="number" id="input_side_da" min="2" max="25" step="0.5" value="10.0" 
+                         oninput="handleSideInputChange('DA', this.value)"
+                         class="w-16 px-1 py-0.5 text-right font-mono font-bold bg-slate-50 border border-slate-200 rounded-lg text-xs focus:bg-white focus:border-sky-500 outline-none text-slate-800">
+                  <span class="text-[10px] text-slate-400">cm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng số đo góc CÓ THỂ GÕ NHẬP / ĐIỀU CHỈNH TRỰC TIẾP -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h5 class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                <i class="fa-solid fa-compass-drafting text-indigo-600"></i>
+                <span>Chỉnh số đo góc trong (độ)</span>
+              </h5>
+              <span id="labelAngleSum" class="text-[10px] text-slate-400 font-normal">Tổng góc = 360°</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 text-xs font-mono text-center">
+              <div class="p-2 bg-white rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 block font-bold">∠A</span>
+                <div class="flex items-center justify-center space-x-0.5 mt-0.5">
+                  <input type="number" id="input_angle_a" min="30" max="150" step="1" value="90" 
+                         oninput="handleAngleInputChange('A', this.value)"
+                         class="w-12 py-0.5 text-center font-mono font-bold bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:border-indigo-500 outline-none text-indigo-700">
+                  <span class="text-[10px] text-slate-400">°</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 block font-bold">∠B</span>
+                <div class="flex items-center justify-center space-x-0.5 mt-0.5">
+                  <input type="number" id="input_angle_b" min="30" max="150" step="1" value="90" 
+                         oninput="handleAngleInputChange('B', this.value)"
+                         class="w-12 py-0.5 text-center font-mono font-bold bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:border-indigo-500 outline-none text-indigo-700">
+                  <span class="text-[10px] text-slate-400">°</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 block font-bold">∠C</span>
+                <div class="flex items-center justify-center space-x-0.5 mt-0.5">
+                  <input type="number" id="input_angle_c" min="30" max="150" step="1" value="90" 
+                         oninput="handleAngleInputChange('C', this.value)"
+                         class="w-12 py-0.5 text-center font-mono font-bold bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:border-indigo-500 outline-none text-indigo-700">
+                  <span class="text-[10px] text-slate-400">°</span>
+                </div>
+              </div>
+              <div class="p-2 bg-white rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 block font-bold">∠D</span>
+                <div class="flex items-center justify-center space-x-0.5 mt-0.5">
+                  <input type="number" id="input_angle_d" min="30" max="150" step="1" value="90" 
+                         oninput="handleAngleInputChange('D', this.value)"
+                         class="w-12 py-0.5 text-center font-mono font-bold bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:border-indigo-500 outline-none text-indigo-700">
+                  <span class="text-[10px] text-slate-400">°</span>
+                </div>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex justify-between text-xs font-mono text-slate-600">
+              <span>Đường chéo AC: <b id="stat_diag_ac" class="text-slate-800">14.1 cm</b></span>
+              <span>BD: <b id="stat_diag_bd" class="text-slate-800">14.1 cm</b></span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ============================================================= -->
+      <!-- BÀI TOÁN CHỨNG MINH GẮN LIỀN VỚI HÌNH VẼ HIỆN TẠI (SGK TOÁN 8) -->
+      <!-- ============================================================= -->
+      <div id="dynamicProofProblemBox" class="mt-4 p-5 bg-gradient-to-r from-amber-50/70 via-indigo-50/30 to-white rounded-3xl border-2 border-amber-200/80 shadow-sm space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-sm shadow-md shadow-amber-200">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+                <span>Bài tập minh họa</span>
+                <span id="proofProblemBadge" class="ml-2 px-2 py-0.5 rounded-full bg-amber-500 text-white font-mono text-[10px] font-bold shadow-2xs">Dạng 1 - Bài 1/10</span>
+              </h4>
+              <p id="proofProblemSubtitle" class="text-[11px] text-slate-500 font-medium">Tự động cập nhật theo số đo hình vẽ</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 flex-wrap">
+            <div class="bg-white/80 p-1 rounded-xl border border-amber-200 flex items-center space-x-1 text-[11px]">
+              <button onclick="changeProblemVariant('PROOF')" id="btnProbVarPROOF" class="px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-white shadow-xs">Dạng 1: Chứng minh</button>
+              <button onclick="changeProblemVariant('CALC')" id="btnProbVarCALC" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900">Dạng 2: Tính toán</button>
+              <button onclick="changeProblemVariant('REAL')" id="btnProbVarREAL" class="px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900">Dạng 3: Thực tế</button>
+            </div>
+            <button onclick="randomizeCurrentProblem()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition-all flex items-center space-x-1 shadow-2xs" title="Đổi ngữ cảnh đề bài ngẫu nhiên">
+              <i class="fa-solid fa-dice text-amber-700"></i>
+              <span>Đổi bài ngẫu nhiên</span>
+            </button>
+            <button onclick="toggleProofSolution()" id="btnToggleSolution" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-indigo-600 border border-slate-200 hover:border-indigo-300 shadow-sm transition-all flex items-center space-x-1.5">
+              <i class="fa-solid fa-eye text-[11px]"></i>
+              <span id="txtToggleSolution">Xem lời giải</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Đề bài toán -->
+        <div class="p-3.5 bg-white rounded-2xl border border-slate-200/80 text-xs text-slate-800 leading-relaxed font-medium">
+          <span class="font-bold text-amber-800 block mb-1">Đề bài:</span>
+          <p id="proofProblemStatement">Cho tứ giác ABCD...</p>
+        </div>
+
+        <!-- Bảng Giả thiết (GT) - Kết luận (KL) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-white rounded-2xl border border-slate-200">
+            <span class="font-bold text-slate-700 block mb-1 text-[11px] uppercase tracking-wider text-indigo-700">Giả thiết (GT):</span>
+            <ul id="proofProblemHypothesis" class="space-y-1 text-slate-600 font-mono text-[11px]"></ul>
+          </div>
+          <div class="p-3 bg-white rounded-2xl border border-slate-200">
+            <span class="font-bold text-slate-700 block mb-1 text-[11px] uppercase tracking-wider text-emerald-700">Kết luận (KL):</span>
+            <ul id="proofProblemConclusion" class="space-y-1 text-slate-600 font-mono text-[11px]"></ul>
+          </div>
+        </div>
+
+        <!-- Khung lời giải mẫu chi tiết -->
+        <div id="proofSolutionDetailBox" class="hidden p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-xs space-y-2">
+          <div class="flex items-center space-x-1.5 font-bold text-emerald-900">
+            <i class="fa-solid fa-check-double text-emerald-600"></i>
+            <span>Lời giải chi tiết từng bước (chuẩn định lý sách giáo khoa):</span>
+          </div>
+          <div id="proofProblemSteps" class="space-y-2 text-slate-700 leading-relaxed pt-1"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- KHUNG CHÍNH 2: BẢN ĐỒ ĐỒ THỊ QUAN HỆ (VIS.JS PHÂN TẦNG)       -->
+    <!-- ============================================================= -->
+    <div id="graphContainerWrapper" class="hidden flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[600px]">
+      
+      <!-- CỘT BÊN TRÁI (50%): SƠ ĐỒ ĐỒ THỊ TRI THỨC NEO4J -->
+      <div id="graphLeftCol" class="lg:col-span-6 bg-white rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden flex flex-col min-h-[580px]">
+        
+        <!-- Header tiêu đề sơ đồ -->
+        <div class="p-3.5 px-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+          <div>
+            <h3 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+              <i class="fa-solid fa-diagram-project text-indigo-600"></i>
+              <span>Sơ đồ Đồ thị Tri thức Neo4j</span>
+            </h3>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              8 hình học &amp; 10 quan hệ suy luận • Kéo thả nút 360°
+            </p>
+          </div>
+
+          <!-- Nút chuyển đổi chế độ xem (50:50 vs Toàn màn hình) -->
+          <button onclick="toggleGraphLayoutMode()" id="btnToggleGraphLayout" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-[11px] font-bold border border-slate-200 shadow-2xs transition-all flex items-center space-x-1">
+            <i class="fa-solid fa-expand text-indigo-600"></i>
+            <span id="txtToggleGraphLayout">Toàn màn hình</span>
+          </button>
+        </div>
+
+        <!-- Khung chứa Vis.js Graph Canvas -->
+        <div id="graphCanvas" class="w-full flex-1 min-h-[500px]" style="min-height: 500px; width: 100%;"></div>
+
+        <!-- Thanh công cụ thu phóng ở góc dưới bên trái -->
+        <div class="absolute bottom-3 left-3 z-10 flex items-center space-x-1 bg-white/90 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm">
+          <button onclick="networkInstance &amp;&amp; networkInstance.moveTo({scale: networkInstance.getScale() * 1.2})" class="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-600 flex items-center justify-center text-xs transition-all" title="Phóng to">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <button onclick="networkInstance &amp;&amp; networkInstance.moveTo({scale: networkInstance.getScale() * 0.8})" class="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-600 flex items-center justify-center text-xs transition-all" title="Thu nhỏ">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <button onclick="fitGraphViewClean()" class="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-600 flex items-center justify-center text-xs transition-all" title="Căn gọn vừa vặn">
+            <i class="fa-solid fa-compress-arrows-alt text-indigo-600"></i>
+          </button>
+          <button onclick="autoUntangleMiniGeometry(); autoUntangleGeometry();" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 font-bold rounded-xl text-xs border border-amber-300 transition-all flex items-center space-x-1 shadow-2xs" title="Gỡ rối khi hình bị cắt chéo cạnh">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
+            <span>Gỡ rối hình</span>
+          </button>
+        </div>
+
+        <!-- Banner hiển thị nội dung quan hệ khi click / hover đường nối -->
+        <div id="graphEdgeDetailsBanner" class="hidden absolute bottom-3 right-3 left-32 z-10 bg-slate-900/90 backdrop-blur-md text-white px-3 py-1.5 rounded-2xl border border-slate-700 shadow-md text-xs flex items-center justify-between animate-fade-in">
+          <div class="flex items-center space-x-2 truncate">
+            <i class="fa-solid fa-circle-info text-amber-400 text-xs"></i>
+            <span id="txtGraphEdgeDetails" class="font-medium text-[11px] truncate text-slate-200">Click hoặc rê chuột vào đường nối để xem điều kiện chuyển tiếp</span>
+          </div>
+          <button onclick="document.getElementById('graphEdgeDetailsBanner').classList.add('hidden')" class="text-slate-400 hover:text-white ml-2">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- CỘT BÊN PHẢI (50%): MÔ PHỎNG HÌNH HỌC ĐỘNG 2D TƯƠNG TÁC SONG SONG -->
+      <div id="graphRightCol" class="lg:col-span-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-xl p-4 flex flex-col justify-between space-y-3">
+        
+        <!-- Header badge -->
+        <div class="flex items-center justify-between w-full text-white">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h3 class="text-sm font-bold font-['Quicksand'] text-white">Mô phỏng Hình học Động 2D</h3>
+          </div>
+          <span id="miniCanvasShapeBadge" class="text-xs font-bold bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-full">Tứ giác</span>
+        </div>
+
+        <!-- Thanh Nút Tạo Nhanh Hình (Preset Snap Toolbar) -->
+        <div class="grid grid-cols-5 gap-1.5 w-full bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800">
+          <button onclick="snapMiniPreset('SQUARE')" class="py-1.5 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs">Vuông</button>
+          <button onclick="snapMiniPreset('RECTANGLE')" class="py-1.5 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs">C.Nhật</button>
+          <button onclick="snapMiniPreset('RHOMBUS')" class="py-1.5 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs">Thoi</button>
+          <button onclick="snapMiniPreset('PARALLELOGRAM')" class="py-1.5 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs">B.Hành</button>
+          <button onclick="snapMiniPreset('TRAPEZOID')" class="py-1.5 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs">Thang</button>
+        </div>
+        
+        <!-- Canvas mini 4 đỉnh drag & drop (kích thước mở rộng 340 x 210) -->
+        <div class="relative flex-1 rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-inner flex items-center justify-center min-h-[220px]">
+          <canvas id="miniGraphInteractiveCanvas" width="340" height="210" class="cursor-crosshair max-w-full"></canvas>
+          
+          <!-- Badge Nam châm hít thông minh -->
+          <div id="miniSnapStatusBadge" class="hidden absolute top-2 left-2 bg-amber-500/90 text-slate-950 px-2.5 py-1 rounded-lg text-xs font-bold backdrop-blur-sm shadow-sm">
+            🧲 Nam châm hít
+          </div>
+        </div>
+
+        <!-- Bảng hiển thị thông số số đo trực tiếp -->
+        <div class="bg-slate-950/90 p-2.5 rounded-2xl border border-slate-800 text-xs text-slate-300 grid grid-cols-2 gap-2 font-mono">
+          <div id="miniTextSides" class="bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">Cạnh: AB=0 BC=0</div>
+          <div id="miniTextAngles" class="bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">Góc: ∠A=0° ∠B=0°</div>
+        </div>
+
+        <!-- Footer hành động -->
+        <div class="flex items-center justify-between w-full space-x-2 text-xs">
+          <button onclick="autoUntangleMiniGeometry()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold rounded-xl border border-amber-500/30 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Nắn lồi (Khôi phục)</span>
+          </button>
+          <button onclick="loadShapeToSandbox(currentMiniMatchedId)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all flex items-center space-x-1.5 shadow-md shadow-indigo-900/40">
+            <span>Mở rộng xưởng lớn</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- KHUNG CHÍNH 3: DANH SÁCH THẺ HÌNH HỌC                          -->
+    <!-- ============================================================= -->
+    <div id="cardsContainerWrapper" class="hidden flex-1 flex flex-col space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-700">Tất cả các hình học phẳng trong hệ thống</h2>
+        <span id="totalShapesCountBadge" class="text-xs text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">8 hình học</span>
+      </div>
+      <div id="shapesCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- 3. CÁC CỬA SỔ CHỨC NĂNG (MODALS)                                  -->
+  <!-- ================================================================= -->
+
+  <!-- MODAL: HỒ SƠ CHI TIẾT HÌNH HỌC (UC03 & UC04) -->
+  <div id="shapeDetailModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      
+      <div id="modalHeader" class="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-white">
+        <div class="flex items-center space-x-3">
+          <div id="modalShapeIcon" class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-200">
+            <i class="fa-solid fa-shapes"></i>
+          </div>
+          <div>
+            <h3 id="modalShapeTitle" class="text-lg font-bold text-slate-800">Hình học</h3>
+            <p id="modalShapeSub" class="text-xs text-slate-500">Tên tiếng Anh và định nghĩa tóm lược</p>
+          </div>
+        </div>
+        <button onclick="closeShapeModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="px-6 border-b border-slate-200 flex space-x-6 text-xs font-semibold text-slate-500 overflow-x-auto">
+        <button onclick="switchTab('props')" id="tabProps" class="py-3 text-indigo-600 border-b-2 border-indigo-600 transition-all whitespace-nowrap">Đặc điểm hình học</button>
+        <button onclick="switchTab('calc')" id="tabCalc" class="py-3 hover:text-slate-800 transition-all whitespace-nowrap">Máy tính công thức</button>
+        <button onclick="switchTab('trans')" id="tabTrans" class="py-3 hover:text-slate-800 transition-all whitespace-nowrap">Chuyển tiếp & chứng minh</button>
+        <button onclick="switchTab('tips')" id="tabTips" class="py-3 hover:text-slate-800 transition-all whitespace-nowrap">Mẹo nhớ & thơ vui</button>
+        <button onclick="switchTab('source')" id="tabSource" class="py-3 hover:text-slate-800 transition-all whitespace-nowrap">Nguồn thẩm định SGK</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4">
+        <div id="tabContentProps" class="space-y-5">
+          
+          <!-- Banner hình vẽ SVG minh họa trực quan & định nghĩa chuẩn -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center p-4 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl border border-slate-800 shadow-lg text-white">
+            <div id="modalSvgContainer" class="md:col-span-5 w-full">
+              <!-- getShapeSvgPreview dynamically inserted here -->
+            </div>
+            <div class="md:col-span-7 space-y-2.5">
+              <div class="flex items-center space-x-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/30 text-indigo-300 border border-indigo-500/40">ĐỊNH NGHĨA SGK</span>
+                <span id="modalShapeEnglishBadge" class="text-xs text-slate-400 font-mono italic">Quadrilateral</span>
+              </div>
+              <p id="modalDefinition" class="text-xs text-slate-200 leading-relaxed font-medium"></p>
+              
+              <!-- Nút mở trực tiếp trong xưởng vẽ -->
+              <button id="btnModalOpenInSandbox" onclick="" class="mt-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1.5">
+                <i class="fa-solid fa-draw-polygon text-amber-300"></i>
+                <span>Thực hành kéo nắn hình này trong Xưởng vẽ</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tiêu đề & Danh sách phân loại tính chất -->
+          <div class="flex items-center justify-between pt-1">
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
+              <i class="fa-solid fa-award text-indigo-600"></i>
+              <span>Hệ thống đặc điểm &amp; Tính chất hình học</span>
+            </h4>
+            <span class="text-[11px] text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full font-medium">Chuẩn chương trình SGK Toán 8</span>
+          </div>
+
+          <div id="modalPropertiesList" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+        </div>
+
+        <div id="tabContentCalc" class="hidden space-y-5">
+          
+          <!-- Thanh chọn loại công thức (Diện tích vs Chu vi) -->
+          <div class="flex items-center justify-between bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+            <div class="flex items-center space-x-2">
+              <button onclick="selectFormulaType('Diện tích')" id="btnFormArea" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-chart-area"></i>
+                <span>Công thức Tính Diện Tích (S)</span>
+              </button>
+              <button onclick="selectFormulaType('Chu vi')" id="btnFormPerim" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 hover:bg-slate-200 transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-border-all"></i>
+                <span>Công thức Tính Chu Vi (P)</span>
+              </button>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium px-2.5 hidden sm:inline">SGK Toán 8</span>
+          </div>
+
+          <!-- Card hiển thị công thức chuẩn Toán học (Dark Mode Showcase Card) -->
+          <div class="p-5 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-3xl border border-slate-800 shadow-xl text-white space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center space-x-1">
+                <i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i>
+                <span>CÔNG THỨC CHUẨN SGK</span>
+              </span>
+              <span id="calcFormulaNameBadge" class="text-xs font-mono text-indigo-300">Công thức cơ bản</span>
+            </div>
+
+            <!-- Công thức LaTeX cỡ lớn rực rỡ -->
+            <div class="p-4 bg-slate-950/80 rounded-2xl border border-slate-800/80 text-center shadow-inner">
+              <div id="calcFormulaLatex" class="text-2xl sm:text-3xl font-mono font-bold text-amber-300 tracking-wider">S = a × b</div>
+            </div>
+
+            <p id="calcFormulaDescText" class="text-xs text-slate-300 text-center font-medium">Kéo thanh trượt hoặc gõ số đo để máy tính tự động xuất lời giải từng bước chuẩn giáo án</p>
+          </div>
+
+          <!-- Khung nhập thông số có thanh trượt Range Slider sinh động -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+              <i class="fa-solid fa-sliders text-indigo-600"></i>
+              <span>Kéo thanh trượt hoặc gõ số đo các kích thước (cm)</span>
+            </h4>
+
+            <div id="calcInputsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+
+            <button onclick="executeCalculation()" class="mt-2 w-full py-3 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white rounded-2xl text-xs font-bold shadow-md transition-all flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-calculator text-amber-300 text-sm"></i>
+              <span>Tính toán kết quả &amp; Trình bày lời giải chi tiết</span>
+            </button>
+          </div>
+
+          <!-- Khung Hộp kết quả và lời giải từng bước -->
+          <div id="calculationResultBox" class="hidden p-5 bg-gradient-to-br from-emerald-50 via-teal-50 to-white rounded-3xl border-2 border-emerald-300/80 shadow-md space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-emerald-200/80">
+              <span class="text-xs font-bold text-emerald-900 flex items-center space-x-1.5">
+                <i class="fa-solid fa-square-check text-emerald-600 text-sm"></i>
+                <span>ĐÁP SỐ CHÍNH XÁC:</span>
+              </span>
+              <span id="calcFinalResult" class="text-xl font-bold font-mono text-emerald-700 bg-emerald-100/80 px-3 py-1 rounded-xl border border-emerald-300"></span>
+            </div>
+
+            <div>
+              <h5 class="text-xs font-bold text-emerald-900 mb-2 flex items-center space-x-1">
+                <i class="fa-solid fa-list-check text-emerald-700"></i>
+                <span>Trình bày lời giải chi tiết chuẩn SGK:</span>
+              </h5>
+              <div id="calcStepList" class="text-xs text-slate-800 space-y-2"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="tabContentTrans" class="hidden space-y-4">
+          <div>
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Các hình có thể nâng cấp thành hình này</h4>
+            <div id="modalPrevShapesList" class="space-y-2"></div>
+          </div>
+          <div class="pt-4 border-t border-slate-200">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Các hình có thể phát triển tiếp từ hình này</h4>
+            <div id="modalNextShapesList" class="space-y-2"></div>
+          </div>
+        </div>
+
+        <div id="tabContentTips" class="hidden space-y-4">
+          <div id="modalTipsList" class="space-y-3"></div>
+
+          <!-- Khung thảo luận & Đóng góp mẹo nhớ từ người dùng -->
+          <div class="p-5 bg-gradient-to-br from-indigo-50/80 via-sky-50/50 to-white rounded-3xl border-2 border-indigo-200 shadow-sm space-y-3 mt-4">
+            <div class="flex items-center justify-between border-b border-indigo-100 pb-2">
+              <h5 class="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center space-x-1.5">
+                <i class="fa-solid fa-comments text-indigo-600"></i>
+                <span>Thảo luận &amp; Đóng góp mẹo nhớ / Bài thơ mới</span>
+              </h5>
+              <span class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full border border-indigo-200">Ghi nhớ tự động &amp; Lưu CSDL</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Tên người đóng góp:</label>
+                <input type="text" id="inputTipAuthor" placeholder="Ví dụ: Bạn An - Lớp 8A (hoặc Thầy Nam)" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium focus:border-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Phân loại bài viết:</label>
+                <select id="selectTipType" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-semibold focus:border-indigo-500 outline-none">
+                  <option value="Thơ ghi nhớ">Thơ ghi nhớ / Thơ vui</option>
+                  <option value="Mẹo né bẫy">Mẹo né bẫy bài thi / Mẹo giải nhanh</option>
+                  <option value="Thảo luận & Hỏi đáp">Thảo luận & Hỏi đáp kiến thức</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-xs">
+              <label class="block font-bold text-slate-700 mb-1">Tiêu đề mẹo / Bài thơ / Thảo luận:</label>
+              <input type="text" id="inputTipTitle" placeholder="Ví dụ: Thơ vui nhận biết hình thoi trong 4 dòng" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium focus:border-indigo-500 outline-none">
+            </div>
+
+            <div class="text-xs">
+              <label class="block font-bold text-slate-700 mb-1">Nội dung chi tiết bài thơ / Mẹo nhớ:</label>
+              <textarea id="inputTipContent" rows="3" placeholder="Nhập bài thơ hoặc mẹo nhớ độc đáo của bạn tại đây..." class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-medium focus:border-indigo-500 outline-none"></textarea>
+            </div>
+
+            <div class="flex justify-end">
+              <button onclick="submitUserTip()" class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-2">
+                <i class="fa-solid fa-paper-plane text-amber-300"></i>
+                <span>Gửi đóng góp &amp; Ghi nhớ bài viết</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="tabContentSource" class="hidden space-y-3">
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 text-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span class="text-slate-500">Mã nguồn sách giáo khoa:</span>
+              <span id="modalSourceId" class="font-bold text-slate-800 font-mono"></span>
+            </div>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span class="text-slate-500">Vị trí bài học và trang sách:</span>
+              <span id="modalSourceLocator" class="font-bold text-slate-800"></span>
+            </div>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span class="text-slate-500">Trạng thái thẩm định chuyên môn:</span>
+              <span id="modalStatusBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">ĐÃ DUYỆT CHUẨN</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500">Giáo viên / Chuyên gia kiểm chứng:</span>
+              <span id="modalVerifiedBy" class="font-bold text-slate-800"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BIÊN SOẠN TRI THỨC MỚI (GIÁO VIÊN) -->
+  <div id="draftModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-teal-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-200">
+            <i class="fa-solid fa-file-circle-plus text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Biên soạn tri thức hình học mới</h3>
+            <p class="text-xs text-slate-500">Bắt buộc đối chiếu nguồn sách giáo khoa chuẩn trước khi gửi duyệt</p>
+          </div>
+        </div>
+        <button onclick="closeDraftModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Loại nội dung biên soạn</label>
+            <select id="draftTypeSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+              <option value="Tính chất mới">Tính chất hình học</option>
+              <option value="Dấu hiệu nhận biết">Dấu hiệu nhận biết</option>
+              <option value="Công thức tính toán">Công thức tính toán</option>
+              <option value="Câu hỏi trắc nghiệm">Câu hỏi trắc nghiệm</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Áp dụng cho hình học</label>
+            <select id="draftShapeSelect" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Tiêu đề hoặc tên định lý</label>
+          <input type="text" id="draftTitleInput" placeholder="Ví dụ: Định lý đường chéo hình thang cân" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Nội dung chi tiết phát biểu</label>
+          <textarea id="draftContentInput" rows="3" placeholder="Nhập định lý, tính chất hoặc câu hỏi trắc nghiệm chi tiết..." class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500 leading-relaxed"></textarea>
+        </div>
+
+        <div class="p-4 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-3">
+          <div class="flex items-center space-x-2 text-amber-800 font-bold">
+            <i class="fa-solid fa-book-bookmark text-amber-600"></i>
+            <span>Đối chiếu nguồn sách giáo khoa (bắt buộc)</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 mb-1">Mã bộ sách (source_id) *</label>
+              <input type="text" id="draftSourceIdInput" placeholder="Ví dụ: SGK Toán 8 - Kết nối tri thức" class="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-xl outline-none focus:border-teal-500">
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1">Vị trí trong sách (source_locator) *</label>
+              <input type="text" id="draftSourceLocatorInput" placeholder="Ví dụ: Chương 3 / Bài 2 / Trang 64" class="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-xl outline-none focus:border-teal-500">
+            </div>
+          </div>
+          <p class="text-[11px] text-amber-700 italic">Hệ thống từ chối lưu nếu để trống mã sách hoặc vị trí trang sách nhằm đảm bảo chuẩn xác toán học.</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Họ tên giáo viên / Người biên soạn</label>
+          <input type="text" id="draftAuthorInput" value="Giáo viên bộ môn Toán" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-teal-500">
+        </div>
+
+        <div id="draftMessageAlert" class="hidden p-3 rounded-xl text-xs"></div>
+      </div>
+
+      <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-end space-x-3">
+        <button onclick="closeDraftModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-all">Đóng lại</button>
+        <button onclick="submitDraftContent()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-200 transition-all flex items-center space-x-1.5">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Lưu nháp & Gửi thẩm định</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: THẨM ĐỊNH VÀ PHÊ DUYỆT SGK (QUẢN TRỊ VIÊN) -->
+  <div id="reviewModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-rose-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-200">
+            <i class="fa-solid fa-stamp text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Thẩm định & Kiểm duyệt tri thức chuẩn SGK</h3>
+            <p class="text-xs text-slate-500">Phê duyệt nội dung hợp chuẩn để xuất bản lên đồ thị tri thức cho học sinh</p>
+          </div>
+        </div>
+        <button onclick="closeReviewModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700">Danh sách nội dung đang chờ thẩm định:</span>
+          <button onclick="loadPendingReviews()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i>Làm mới
+          </button>
+        </div>
+        <div id="reviewItemsList" class="space-y-4"></div>
+      </div>
+
+      <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <span>Quyền hạn: Quản trị viên / Tổ trưởng chuyên môn Toán</span>
+        <button onclick="closeReviewModal()" class="px-4 py-2 rounded-xl font-semibold bg-white border border-slate-200 hover:bg-slate-100 transition-all">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHỈ ĐƯỜNG CHỨNG MINH (UC05) -->
+  <div id="proofPathModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-emerald-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-200">
+            <i class="fa-solid fa-route text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Chỉ đường chứng minh hình học</h3>
+            <p class="text-xs text-slate-500">Tìm lộ trình ngắn nhất với từng dấu hiệu nhận biết cụ thể</p>
+          </div>
+        </div>
+        <button onclick="closeProofModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Hình xuất phát ban đầu</label>
+            <select id="proofStartSelect" onchange="findProofPath()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Hình đích cần chứng minh</label>
+            <select id="proofEndSelect" onchange="findProofPath()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500"></select>
+          </div>
+        </div>
+
+        <button onclick="findProofPath()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-200 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-magnifying-glass-location"></i>
+          <span>Cập nhật lộ trình chứng minh</span>
+        </button>
+
+        <div id="proofResultsBox" class="space-y-3 pt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SO SÁNH HAI HÌNH HỌC (UC06) -->
+  <div id="compareModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-amber-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-200">
+            <i class="fa-solid fa-code-compare text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">So sánh đối chiếu hai hình học</h3>
+            <p class="text-xs text-slate-500">Khám phá điểm tương đồng và những đặc trưng khác biệt</p>
+          </div>
+        </div>
+        <button onclick="closeCompareModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Chọn hình thứ nhất</label>
+            <select id="compareSelect1" onchange="compareShapes()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-amber-500"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Chọn hình thứ hai</label>
+            <select id="compareSelect2" onchange="compareShapes()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-amber-500"></select>
+          </div>
+        </div>
+
+        <button onclick="compareShapes()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-200 transition-all flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-arrows-split-up-and-left"></i>
+          <span>Cập nhật đối chiếu so sánh</span>
+        </button>
+
+        <div id="compareResultsBox" class="space-y-3 pt-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHÒNG TRẮC NGHIỆM GỢI Ý 3 TẦNG (UC07) -->
+  <div id="quizModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-purple-50/70">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-md shadow-purple-200">
+            <i class="fa-solid fa-graduation-cap text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">Phòng luyện tập trắc nghiệm</h3>
+            <p class="text-xs text-slate-500">Kèm tính năng gợi ý thông minh 3 tầng giúp học sinh tự tư duy</p>
+          </div>
+        </div>
+        <button onclick="closeQuizModal()" class="w-8 h-8 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-all">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div class="flex items-center justify-between text-xs text-slate-500 pb-2 border-b border-slate-100">
+          <span id="quizProgressText">Câu hỏi 1 / 4</span>
+          <span id="quizScoreText" class="font-bold text-purple-700">Điểm số: 0</span>
+        </div>
+
+        <h4 id="quizQuestionTitle" class="text-sm font-bold text-slate-800 leading-relaxed">Nội dung câu hỏi đang tải...</h4>
+        <div id="quizOptionsContainer" class="space-y-2.5"></div>
+
+        <div id="quizFeedbackBox" class="hidden p-4 rounded-2xl text-xs space-y-1"></div>
+
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i>Gợi ý tư duy 3 tầng:</span>
+            <button id="btnNextHint" onclick="showNextHint()" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold underline">
+              Mở gợi ý tiếp theo (<span id="hintCurrentLevel">0</span>/3)
+            </button>
+          </div>
+          <div id="quizHintsList" class="space-y-1.5 text-xs text-slate-600 pt-1"></div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="prevQuestion()" id="btnPrevQ" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">Câu trước</button>
+          <button onclick="nextQuestion()" id="btnNextQ" class="px-4 py-2 rounded-xl text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-all">Câu tiếp theo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. HỘP TRÒ CHUYỆN VỚI TRỢ LÝ GEOBOT (UC08) -->
+  <div onclick="toggleChatbot()" id="chatbotToggleBtn" class="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center shadow-lg shadow-indigo-300 hover:scale-105 transition-all cursor-pointer group">
+    <i class="fa-solid fa-comment-dots text-xl group-hover:rotate-12 transition-transform"></i>
+    <span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white"></span>
+  </div>
+
+  <div id="chatbotBox" class="hidden fixed bottom-24 right-6 z-40 w-80 sm:w-96 h-[460px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-slide-up">
+    <div class="px-4 py-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white flex items-center justify-between">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+          <i class="fa-solid fa-robot text-sm"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold font-['Quicksand']">Trợ lý GeoBot</h4>
+          <span class="text-[10px] text-indigo-100 block">Sẵn sàng giải đáp toán học</span>
+        </div>
+      </div>
+      <button onclick="toggleChatbot()" class="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center text-white transition-all">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </button>
+    </div>
+
+    <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+      <div class="flex items-start space-x-2">
+        <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div class="p-3 bg-slate-100 rounded-2xl rounded-tl-none text-slate-700 leading-relaxed">
+          Chào bạn! Mình là GeoBot. Bạn có thể hỏi mình về định nghĩa, tính chất, công thức hay cách nhận biết bất kỳ hình phẳng nào nhé!
+        </div>
+      </div>
+    </div>
+
+    <div class="p-3 border-t border-slate-100 flex items-center space-x-2 bg-slate-50/50">
+      <input type="text" id="chatInput" placeholder="Nhập câu hỏi hình học..." 
+             class="flex-1 px-3.5 py-2 bg-white rounded-full border border-slate-200 text-xs outline-none focus:border-indigo-500"
+             onkeypress="if(event.key === 'Enter') sendChatMessage()">
+      <button onclick="sendChatMessage()" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center text-xs transition-all shadow-sm">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+    GeoGraph - Nền tảng Đồ thị Tri thức Hình học Phẳng Tương tác
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

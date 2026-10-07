@@ -1,0 +1,16 @@
+{
+  "name": "geograph-plane-geometry-neo4j",
+  "version": "1.0.0",
+  "description": "GeoGraph - He Thong Tra Cuu & Kham Pha Do Thi Tri Thuc Hinh Hoc Phang Neo4j",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed_neo4j.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "neo4j-driver": "^5.20.0"
+  }
+}

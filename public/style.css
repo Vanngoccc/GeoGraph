@@ -1,0 +1,95 @@
+/* GeoGraph Custom Stylesheet */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Custom scrollbar thanh mảnh */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hiệu ứng tương tác cho SVG hình học */
+.svg-edge {
+  transition: stroke 0.2s, stroke-width 0.2s;
+  cursor: pointer;
+}
+.svg-edge:hover {
+  stroke: #f59e0b !important;
+  stroke-width: 3.5 !important;
+}
+
+.svg-diagonal {
+  stroke-dasharray: 4, 4;
+}
+
+.svg-angle {
+  fill: none;
+  stroke: #ef4444;
+  stroke-width: 1.5;
+}
+
+/* Vis.js network container */
+#graphCanvas {
+  outline: none;
+}
+
+.cursor-grab {
+  cursor: grab;
+}
+.cursor-grab:active {
+  cursor: grabbing;
+}
+
+circle.cursor-pointer {
+  cursor: grab;
+}
+circle.cursor-pointer:active {
+  cursor: grabbing;
+}
+
