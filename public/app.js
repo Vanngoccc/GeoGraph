@@ -1094,6 +1094,40 @@ function initMiniGraphCanvas() {
     miniDragTarget = null;
   });
 
+  // Hỗ trợ cảm ứng trên điện thoại cho Canvas mini
+  canvas.ontouchstart = (e) => {
+    if (!e.touches || e.touches.length === 0) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const pos = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    for (const k of ['A', 'B', 'C', 'D']) {
+      const pt = miniPoints[k];
+      const dist = Math.hypot(pos.x - pt.x, pos.y - pt.y);
+      if (dist < 24) {
+        miniDragTarget = k;
+        e.preventDefault();
+        break;
+      }
+    }
+  };
+
+  window.addEventListener('touchmove', (e) => {
+    if (!miniDragTarget || !e.touches || e.touches.length === 0) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const pos = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    miniPoints[miniDragTarget] = {
+      x: Math.max(15, Math.min(255, pos.x)),
+      y: Math.max(15, Math.min(165, pos.y))
+    };
+    drawMiniCanvas();
+    e.preventDefault();
+  }, { passive: false });
+
+  window.addEventListener('touchend', () => {
+    miniDragTarget = null;
+  });
+
   drawMiniCanvas();
 }
 
