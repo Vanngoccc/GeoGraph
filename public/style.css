@@ -102,24 +102,33 @@ circle.cursor-pointer:active {
 }
 
 /* =====================================================================
-   TỐI ƯU HÓA RESPONSIVE RIÊNG CHO ĐIỆN THOẠI & TABLET (< 768px)
+   HỆ THỐNG RESPONSIVE TOÀN DIỆN (MOBILE, TABLET, SMALL DESKTOP)
    ===================================================================== */
+
+/* 1. MÀN HÌNH ĐIỆN THOẠI VÀ MÁY TÍNH BẢNG NHỎ (Dưới 768px) */
 @media (max-width: 768px) {
-  /* Khung chứa header tự co nhỏ padding */
+  /* Header di động: chuyển thành 2 hàng gọn gàng */
   header {
     height: auto !important;
-    padding: 0.5rem 0.25rem !important;
+    padding: 0.5rem 0.75rem !important;
   }
   
   header > div {
     height: auto !important;
     flex-wrap: wrap !important;
+    justify-content: space-between !important;
     gap: 0.5rem !important;
+  }
+
+  /* 3 Tab chính thu nhỏ font và padding để không vỡ màn hình */
+  #btnViewSandbox, #btnViewGraph, #btnViewCards {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 11px !important;
   }
 
   /* SVG bảng vẽ tự điều chỉnh chiều cao trên màn hình dọc */
   #geometrySvg {
-    height: 300px !important;
+    height: 280px !important;
     touch-action: none;
   }
 
@@ -127,6 +136,7 @@ circle.cursor-pointer:active {
   #miniGraphInteractiveCanvas {
     touch-action: none;
     max-width: 100% !important;
+    height: auto !important;
   }
 
   /* Khung Vis.js trên điện thoại gọn gàng */
@@ -141,5 +151,68 @@ circle.cursor-pointer:active {
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
   }
+
+  /* Modal trên di động: Full màn hình, bo góc nhỏ hơn, cuộn mượt */
+  #shapeDetailModal > div,
+  #proofRouteModal > div,
+  #compareModal > div,
+  #quizModal > div,
+  #draftModal > div,
+  #reviewModal > div {
+    max-width: 96% !important;
+    max-height: 94vh !important;
+    border-radius: 1.25rem !important;
+    margin: 0.5rem !important;
+  }
+
+  /* Header modal co nhỏ padding */
+  #modalHeader {
+    padding: 0.75rem 1rem !important;
+  }
+
+  /* Danh sách tab trong Modal cuộn ngang không bị cắt */
+  #shapeDetailModal .overflow-x-auto {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Bảng thông số số đo cạnh/góc trên di động */
+  .grid-cols-2, .grid-cols-4 {
+    gap: 0.375rem !important;
+  }
+
+  /* Giảm padding các khối nội dung chính */
+  main {
+    padding: 0.5rem !important;
+  }
+
+  #sandboxContainerWrapper,
+  #graphLeftCol,
+  #graphRightCol {
+    padding: 0.75rem !important;
+    border-radius: 1.25rem !important;
+  }
 }
+
+/* 2. MÀN HÌNH TABLET VÀ LAPTOP NHỎ (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #geometrySvg {
+    height: 340px !important;
+  }
+
+  #graphCanvas {
+    min-height: 440px !important;
+  }
+
+  main {
+    padding: 1rem !important;
+  }
+}
+
+/* 3. TỐI ƯU CẢM ỨNG DI ĐỘNG CHUNG */
+input[type="number"], select, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 
