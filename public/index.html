@@ -113,29 +113,29 @@
     <div id="sandboxContainerWrapper" class="flex-1 bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col space-y-4">
       
       <!-- Thanh công cụ mẫu nắn hình nhanh -->
-      <div class="p-3 bg-slate-100/80 rounded-2xl border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div class="flex items-center space-x-1.5 flex-wrap">
-          <span class="text-slate-600 font-bold mr-1"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1"></i>Mẫu hình nhanh:</span>
-          <button onclick="snapToPreset('SQUARE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình vuông</button>
-          <button onclick="snapToPreset('RECTANGLE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình chữ nhật</button>
-          <button onclick="snapToPreset('RHOMBUS')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thoi</button>
-          <button onclick="snapToPreset('PARALLELOGRAM')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình bình hành</button>
-          <button onclick="snapToPreset('ISOSCELES_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thang cân</button>
-          <button onclick="snapToPreset('RIGHT_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Hình thang vuông</button>
-          <button onclick="snapToPreset('FREE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm">Tứ giác tự do</button>
+      <div class="p-3 bg-slate-100/80 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-2.5 text-xs">
+        <div class="flex items-center space-x-1.5 overflow-x-auto quick-shapes-scroll py-1 w-full md:w-auto">
+          <span class="text-slate-600 font-bold mr-1 shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1"></i>Mẫu hình:</span>
+          <button onclick="snapToPreset('SQUARE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình vuông</button>
+          <button onclick="snapToPreset('RECTANGLE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình chữ nhật</button>
+          <button onclick="snapToPreset('RHOMBUS')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình thoi</button>
+          <button onclick="snapToPreset('PARALLELOGRAM')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình bình hành</button>
+          <button onclick="snapToPreset('ISOSCELES_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình thang cân</button>
+          <button onclick="snapToPreset('RIGHT_TRAPEZOID')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Hình thang vuông</button>
+          <button onclick="snapToPreset('FREE')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 hover:text-sky-700 border border-slate-200 font-bold transition-all shadow-sm shrink-0">Tứ giác tự do</button>
         </div>
-        <div class="flex items-center space-x-4">
-          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium" title="Tự động dính đỉnh vào ô lưới 1cm (20px) khi kéo">
+        <div class="flex items-center space-x-3 overflow-x-auto py-1 shrink-0">
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium shrink-0" title="Tự động dính đỉnh vào ô lưới 1cm (20px) khi kéo">
             <input type="checkbox" id="chkGridSnap" checked onchange="toggleGridSnap(this.checked)" class="rounded text-indigo-600">
-            <span>Hút điểm lưới (1cm)</span>
+            <span>Hút điểm lưới</span>
           </label>
-          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium">
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium shrink-0">
             <input type="checkbox" id="chkShowDiagonals" checked onchange="drawGeometrySandbox()" class="rounded text-indigo-600">
-            <span>Đường chéo AC, BD</span>
+            <span>Đường chéo</span>
           </label>
-          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium">
+          <label class="flex items-center space-x-1.5 cursor-pointer text-slate-700 font-medium shrink-0">
             <input type="checkbox" id="chkShowAngles" checked onchange="drawGeometrySandbox()" class="rounded text-indigo-600">
-            <span>Góc và ký hiệu 90°</span>
+            <span>Góc 90°</span>
           </label>
         </div>
       </div>
