@@ -1,4 +1,10 @@
 /* GeoGraph Custom Stylesheet */
+
+/* ===== GLOBAL ZOOM — khớp giao diện local 80% browser zoom ===== */
+html {
+  zoom: 85%;
+}
+
 @keyframes scaleUp {
   from {
     opacity: 0;
